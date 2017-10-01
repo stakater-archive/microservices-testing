@@ -18,23 +18,23 @@ A common problem is that teams conflate the concepts of end-to-end tests, UI tes
 
 ![Testing Strategies for Microservices](img/test-types.png)
 
-# Unit Tests
+## Unit Tests
 
 Unit tests : exercise the smallest pieces of testable software in the application to determine whether they behave as expected.
 
-# Integration Tests
+## Integration Tests
 
 Integration tests : verify the communication paths and interactions between components to detect interface defects.
 
-# Component tests
+## Component tests
 
 limit the scope of the exercised software to a portion of the system under test, manipulating the system through internal code interfaces and using test doubles to isolate the code under test from other components.
 
-# Contract tests
+## Contract tests
 
 Verify interactions at the boundary of an external service asserting that it meets the contract expected by a consuming service.
 
-# End-to-end tests
+## End-to-end tests
 
 verify that a system meets external requirements and achieves its goals, testing the entire system, from end to end.
 
