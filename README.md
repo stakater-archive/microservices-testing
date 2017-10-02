@@ -38,6 +38,16 @@ A common problem is that teams conflate the concepts of end-to-end tests, UI tes
   
 * The presence of network partitions affects the style of testing employed. Tests of these modules can have longer execution times and may fail for reasons outside of the team's control.
 
+### Internal Resources 
+
+are useful for more than just testing...
+
+Though it may seem strange, exposing internal controls as resources can prove useful in a number of cases besides testing such as monitoring, maintenance and debugging. The uniformity of a RESTful API means that many tools already exist for interacting with such resources which can help reduce overall operational complexity.
+
+The kinds of internal resources that are typically exposed include logs, feature flags, database commands and system metrics. Many microservices also include health check resources which provide information about the health of the service and its dependencies, timings for key transactions and details of configuration parameters. A simple ping resource can also be useful to aid in load balancing.
+
+Since these resources are more privileged in terms of the control they have or the information they expose, they often require their own authentication or to be locked down at the network level. By namespacing those parts of the API that form the internal controls using URL naming conventions or by exposing those resources on a different network port, access can be restricted at the firewall level.
+
 # Testing Strategies for Microservices
 
 ![Testing Strategies for Microservices](img/test-types.png)
@@ -58,33 +68,26 @@ Integration tests : verify the communication paths and interactions between comp
 
 limit the scope of the exercised software to a portion of the system under test, manipulating the system through internal code interfaces and using test doubles to isolate the code under test from other components.
 
-## In Process
+### In Process
 
-## Out Process
+### Out Process
 
 ## Contract tests
 
 Verify interactions at the boundary of an external service asserting that it meets the contract expected by a consuming service.
 
-## End-to-end tests
-
-verify that a system meets external requirements and achieves its goals, testing the entire system, from end to end.
-
-## Internal Resources 
-
-are useful for more than just testing...
-
-Though it may seem strange, exposing internal controls as resources can prove useful in a number of cases besides testing such as monitoring, maintenance and debugging. The uniformity of a RESTful API means that many tools already exist for interacting with such resources which can help reduce overall operational complexity.
-
-The kinds of internal resources that are typically exposed include logs, feature flags, database commands and system metrics. Many microservices also include health check resources which provide information about the health of the service and its dependencies, timings for key transactions and details of configuration parameters. A simple ping resource can also be useful to aid in load balancing.
-
-Since these resources are more privileged in terms of the control they have or the information they expose, they often require their own authentication or to be locked down at the network level. By namespacing those parts of the API that form the internal controls using URL naming conventions or by exposing those resources on a different network port, access can be restricted at the firewall level.
-
-# Consumer Driven Contracts
+### Consumer Driven Contracts
   
 It's nearly impossible for you to know all the ways consumers might use your services. With a [consumer-driven contract](http://martinfowler.com/articles/consumerDrivenContracts.html) model, it's the consumer's responsibility to provide a suite of tests that specify what types of interactions are needed and in which format. Your service would then agree to this contract and ensure that it's not broken. This gets rid of dependencies on other services. This approach also enables you to verify that the contract is being fulfilled at build time.
 
 Tools like [Pact](https://github.com/realestate-com-au/pact) will give you a better understanding of how you can achieve this type of functionality for developing and testing microservices. Once you have a consumer-driven contract process in place, the next key step in testing microservices is to shift-right into the previously forbidden world of production.
+
+## End-to-end tests
+
+verify that a system meets external requirements and achieves its goals, testing the entire system, from end to end.
+
+## Synthetic Transactions (Tests running production)
+
 
 # References
 
