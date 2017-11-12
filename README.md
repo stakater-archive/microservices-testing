@@ -88,6 +88,8 @@ verify that a system meets external requirements and achieves its goals, testing
 
 ## Synthetic Transactions (Tests running production)
 
+Unit and integration tests are used to test the individual parts of the microservice, and component tests are used to test the service as a whole. 
+
 ---
 
 However, there are three kinds of tests we are interested in running from our continuous integration build: unit tests, component tests, and acceptance tests:
