@@ -88,8 +88,20 @@ verify that a system meets external requirements and achieves its goals, testing
 
 ## Synthetic Transactions (Tests running production)
 
+---
+
+However, there are three kinds of tests we are interested in running from our continuous integration build: unit tests, component tests, and acceptance tests:
+
+- **Unit tests** are written to test the behavior of small pieces of your application in isolation (say, a method, or a function, or the interactions between a small group of them). They can usually be run without starting the whole application. They do not hit the database (if your application has one), the filesystem, or the network. They don’t require your application to be running in a production-like environment. Unit tests should run very fast—your whole suite, even for a large application, should be able to run in under ten minutes.
+
+- **Component tests** test the behavior of several components of your application. Like unit tests, they don’t always require starting the whole application. However, they may hit the database, the filesystem, or other systems (which may be stubbed out). Component tests typically take longer to run.
+
+- **Acceptance tests** test that the application meets the acceptance criteria decided by the business, including both the functionality provided by the application and its characteristics such as capacity, availability, security, and so on. Acceptance tests are best written in such a way that they run against the whole application in a production-like environment. Acceptance tests can take a long time to run—it’s not unheard of for an acceptance test suite to take more than a day to run sequentially.
+
+These three sets of tests, combined, should provide an extremely high level of confidence that any introduced change has not broken existing functionality.
 
 # References
 
 * https://martinfowler.com/articles/microservice-testing/
 * https://www.thoughtworks.com/insights/blog/architecting-continuous-delivery
+* CD Book
