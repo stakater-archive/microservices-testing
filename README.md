@@ -188,6 +188,60 @@ Testing the security of your microservice is slightly different depending on how
 
 The final type of tests to run is security scanners such as IBM Security AppScan® to highlight security holes. A
 
+## Staging environment
+
+This section defines a staging environment as a test environment that is identical (where possible) to the production environment. The build pipeline deploys successfully tested microservices to the staging environment where tests are run to verify the communication across logical boundaries, that is, between microservices.
+
+### Test data
+
+The staging environment should include any data stores that will be in your production system. The data in this data store will be more complete than at the individual microservice level, as these tests are testing more complicated interactions. Use tools to inject data into tests for you. Tools allow you to have more control over the flow of data around the system, enabling you to test what happens if bad data is introduced.
+
+### Integration
+Integration tests are used to test the interactions between all the services in the system. The in-depth behavior of the individual services has already been tested at this stage. The consumer driven contract tests should have ensured that the services interact successfully, but these tests identify bugs that have been missed. The tests should check the basic success and error paths of service communication with the application deployed. Use the test data as discussed in the previous section.
+
+Rather than testing all of the services at once, it might still be necessary to mock out some of the services during testing. Test the interaction of two specific services, or a small set of services, adding in mocked behavior when calls are made to outside the set. Mocking the calls to the services outside the group under test is done in the same way as the unit tests on the APIs. The same techniques that are used to start and stop the server or container for contract testing also apply here. 
+
+### Contract
+Every service that consumes another service or resource should have a set of contract tests that are run against that resource (especially in staging environments). Given that services evolve independently over time, it is important to ensure that the consumer's contract continues to be satisfied.
+
+These tests are specifically written by the consumer (the client side), and are run and managed as part of the test suite for the consuming service. By contrast, the tests that are discussed in 7.3.2, “Testing resources” on page 81 are written by the provider to verify the contract as a whole.
+
+### End-to-end
+End-to-end testing is essential to find the bugs that were missed previously. End-to-end tests should exercise certain “golden paths” through the application. It is unrealistic to test every path through the application with an end-to-end test, so identify the key ones and test those.
+
+A good way to identify these paths through the environment is to review the key external requirements of an application. For example, if your application is an online retail store you might test the following paths:
+
+- User logs in
+- User purchases an item
+- User views the summary of the order
+- User cancels the order
+
+End-to-end testing should also include the user interface. Tools such as SeleniumHQ can be
+used to automate interactions with a web browser for testing. Fo
+
+### Fault tolerance and resilience
+
+A microservice should be designed in a fault tolerant way as described in 4.2, “Fault tolerance” on page 37. Various techniques can be used to increase the resilience and fault tolerance of individual microservices, but you should still test how fault tolerant your system is as a whole. Tests for fault tolerance should be performed with all of the services deployed. Do not use any mocks.
+
+#### Taking down individual microservices
+In a microservice system, you must not rely on all of the microservices being available at any one time. During the testing phase, make requests to the system while taking down and redeploying individual services. This process should include the microservices in the system and backend data stores. Monitor the time for requests to return and identify an acceptable response time for your application. If the response times are too long, consider reducing the timeout values on your services or altering the circuit breaker configurations.
+
+There are tools that can automate this process, the best known of which within the Java community is Netflix Chaos Monkey, which terminates instances of virtual machines to allow testing of fault tolerance. For more information about Netflix Chaos Monkey, see the following website:
+https://github.com/Netflix/SimianArmy/wiki/Chaos-Monkey
+
+Other tools, such as Gremlin, which is used by Amalgam8, take the approach of intercepting and manipulating calls to microservices rather than shutting down instances. For more information about Gremlin, see this website:
+https://github.com/ResilienceTesting/gremlinsdk-python
+
+### Injecting bad data
+As in the integration tests, tools such as Amalgam8 can be used to automate the injection of bad data during testing. If you have successfully used the bulk head pattern, then bad data in one microservice should not propagate to other microservices 
+
+### Stress testing
+Microservices should be able to handle unexpected loads. Stress testing should be used to test the bulk heads in your microservices. If a particular microservice is holding up requests, look at the configured bulk heads.
+
+### Recoverability testing
+Individual microservices should also be resilient to problems in their own deployment. If a container or virtual machine goes down, the microservice needs to be able to recover quickly. Orchestration tools such as Amalgam8 or Kubernetes5 (for container orchestration) will spin up new instances of any application if one goes down. A microservice must have fast startup time and, when a shutdown is required, it should shut down gracefully. Using an application server that provides a fast startup time is also essential.
+
+Couple your recoverability testing with taking down service instances. Allow your orchestration system to create the new instances and monitor how long it takes to start the new service
 
 # References
 
