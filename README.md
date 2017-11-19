@@ -110,6 +110,85 @@ These three sets of tests, combined, should provide an extremely high level of c
 
 Tests should be automated as part of the build, release, run (delivery) pipeline.
 
+## Single Service Testing
+
+This section defines single service testing as the tests that the owners of an individual service must create and run. These tests exercise the code that is contained inside the logical boundary in the diagram of the internal microservice architecture. Three types of tests apply here: Unit tests, component tests, and integration tests. Unit and integration tests are used to test the individual parts of the microservice, and component tests are used to test the service as a whole. 
+
+### Testing domain or business function
+
+The code in your microservice that performs business function should not make calls to any services external to the application. This code can be tested by using unit tests and a testing framework such as JUnit1. The unit tests should test for behavior and either use the actual objects (if no external calls are needed) or mock the objects involved in any operations.
+
+When writing tests using the actual objects, a simple JUnit test suffices. For creating mocks of objects, you can either use the built-in capabilities of Java EE or use a mocking framework. The @Alternatives annotation2 in the Context and Dependency Injection (CDI) specification enables injection of mock objects instead of the actual beans. Plenty of mocking frameworks are available for Java. For example, JMockit3 is designed to work with JUnit to allow you to mock objects during testing. In the most basic test using JMockit, you can create mocked objects by using the @Mocked annotation and define behavior when this object is called by using the Expectations() function.
+
+### Testing resources
+
+Classes that expose JAX-RS endpoints or receive events should be tested by using two types of tests: Integration tests and contract tests.
+
+#### Integration tests
+Integration tests are used to verify the communication across network boundaries. They should test the basic success and failure paths in an exchange. Integration tests can either be run in the same way as unit tests, or by standing up the application on a running server. To run integration tests without starting the server, call the methods that carry JAX-RS annotations directly. During the tests, create mocks for the objects that the resource classes call when a request comes in.
+
+To run integration tests on a running server, you can use one of the methods described in “Tests on a running server” on page 82. To drive the code under test, use the JAX-RS clientprovided by JAX-RS 2.0. to send requests.
+
+Integration tests should validate the basic success and error paths of the application. Incorrect requests should return useful responses with the appropriate error code.
+
+#### Consumer driven contract
+
+A consumer of a particular service has a set of input and output attributes that it expects the service to adhere to. This set can include data structures, performance, and conversations. The contract is documented by using a tool like Swagger. Generally, have the consumers of a service drive the definition of the contract, which is the origin of the term consumer driven contract.
+
+Consumer driven contract tests are a set of tests to determine whether the contract is being upheld. These tests should validate that the resources expect the input attributes defined in the contract, but also accepts unknown attributes (it should just ignore them). They should also validate that the resources return only those attributes that are defined in the documentation. To isolate the code under test, use mocks for the domain logic.
+
+Maintaining consumer driven contract tests introduces some organizational complexity. If the tests do not accurately test the contract defined, they are useless. In addition, if the contract is out of date, then even the best tests will not result in a useful resource for the consumer. Therefore, it is vital that the consumer driven contract is kept up to date with current consumer needs and that the tests always accurately test the contract.
+
+Contract tests require the actual API to be implemented. This technique requires the application be deployed onto a server.  Use tools such as the Swagger editor4 to create these tests. The Swagger editor can take the API documentation and produce implementations in many different languages. 
+
+Another dimension to contract testing is the tests that are run by the consumer. These tests must be run in an environment where the consumer has access to a live version of the service, which is the staging environment. 
+
+#### Tests on a running server
+A few different methods are available for starting and stopping the application server as part of your automated tests. There are Maven and Gradle plug-ins for application servers such as WebSphere Application Server Liberty that allow you to add server startup into your build lifecycle. This method keeps complexity out of your application and contains it in the build code. For more information about these plug-ins, see the following websites:
+
+- Maven: https://github.com/WASdev/ci.maven
+- Gradle: https://github.com/WASdev/ci.gradle
+
+Another solution is to use Arquillian. Arquillian can be used to manage the applications server during tests. It allows you to start and stop the server mid-test, or start multiple servers. Arquillian is also not affected by the container, so if you write Arquillian tests, they can be used on any application server. This feature is useful for contract testing because the consumers do not have to understand the application server or container that is used by the producer. For more information about Arquillian, see the following website:
+http://arquillian.org
+
+### Testing external service requests
+
+Inevitably, your microservice must make calls to external services to complete a request, such as calls to other microservices in the application or services external to the application. The classes to do this construct clients that make the requests and handle any failures. The code can be tested by using two sets of integration tests: One at the single service level and one in the staging environment. Both sets test the basic success and error handling of the client. More information about the tests in the staging environment is available in 7.4.2, “Integration” on page 86.
+
+The integration tests at the single service level do not require the service under test or the external services to be deployed. To perform the integration tests, mock the response from the external services. If you are using the JAX-RS 2.0 client to make the external requests, this process can be done easily by using the JMockit framework
+
+### Testing data requests
+
+In a microservice architecture, each microservice owns its own data. If you follow this guideline, the developers of a microservice are also responsible for any external data stores used. The code that makes requests to the external data store and performs data mapping and validation is contained in the repositories layer. When testing the domain logic, this layer should be mocked. Tests for data requests, data mapping, and validation are done by using integration tests with the microservice and a test data store deployed locally or on a private cloud. The tests check the basic success and error paths for data requests. If the data mapping and validation for your application requires extensive testing, consider separating out this code and testing it using a mocked database client class.
+
+**Test data**
+
+The local version of the data store must be populated with data for testing. Think carefully about what data you put in the data store. The data should be structured in the same way as production data but should not be unnecessarily complicated. It must serve the specific purpose of enabling data request tests.
+
+###  Component testing
+
+Component tests are designed to test an individual microservice as one piece. The component is everything inside the network boundary, so calls to external services are either mocked or are replaced with a “test-service.” There are advantages and disadvantages to both scenarios.
+
+**Using mocks**
+
+By mocking the calls to external services, you have fewer test objects to configure. You can easily define the behavior of the mocked system by using frameworks like JMockit, and no tests will fail due to network problems. The disadvantage of this approach is that it does not fully exercise the component because you are intercepting some of the calls, increasing the risk of bugs slipping through.
+
+**Test services**
+
+To fully exercise the communication boundaries of your microservice, you can create test services to mimic the external services that are called in production. These test services can also include a test database. The test services can also be used as a reference for consumers of your microservice. The disadvantage of this system is that it requires you to maintain your test services. This technique requires more processor cycles than maintaining a mocking system as you must fully test the test microservice and create a deployment pipeline.
+
+After you are using a mocking framework for other levels of testing, it makes sense to reuse those skills. However, if you do take the mocking approach, you must make sure that the tests in your staging environment exercise inter-service communications effectively. 
+
+### Security verification
+
+Security is important in a distributed system. You can no longer put your application behind a firewall and assume that nothing will break through.
+
+Testing the security of your microservice is slightly different depending on how you implement security. If the individual services are just doing token validation, then test at the individual service level. If you are using another service or a library to validate the tokens, then that service should be tested in isolation and the interactions should be tested in the staging environment.
+
+The final type of tests to run is security scanners such as IBM Security AppScan® to highlight security holes. A
+
+
 # References
 
 * https://martinfowler.com/articles/microservice-testing/
