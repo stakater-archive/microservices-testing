@@ -232,13 +232,13 @@ https://github.com/Netflix/SimianArmy/wiki/Chaos-Monkey
 Other tools, such as Gremlin, which is used by Amalgam8, take the approach of intercepting and manipulating calls to microservices rather than shutting down instances. For more information about Gremlin, see this website:
 https://github.com/ResilienceTesting/gremlinsdk-python
 
-### Injecting bad data
+#### Injecting bad data
 As in the integration tests, tools such as Amalgam8 can be used to automate the injection of bad data during testing. If you have successfully used the bulk head pattern, then bad data in one microservice should not propagate to other microservices 
 
-### Stress testing
+#### Stress testing
 Microservices should be able to handle unexpected loads. Stress testing should be used to test the bulk heads in your microservices. If a particular microservice is holding up requests, look at the configured bulk heads.
 
-### Recoverability testing
+#### Recoverability testing
 Individual microservices should also be resilient to problems in their own deployment. If a container or virtual machine goes down, the microservice needs to be able to recover quickly. Orchestration tools such as Amalgam8 or Kubernetes5 (for container orchestration) will spin up new instances of any application if one goes down. A microservice must have fast startup time and, when a shutdown is required, it should shut down gracefully. Using an application server that provides a fast startup time is also essential.
 
 Couple your recoverability testing with taking down service instances. Allow your orchestration system to create the new instances and monitor how long it takes to start the new service
