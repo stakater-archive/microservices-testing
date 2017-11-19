@@ -102,6 +102,14 @@ However, there are three kinds of tests we are interested in running from our co
 
 These three sets of tests, combined, should provide an extremely high level of confidence that any introduced change has not broken existing functionality.
 
+---
+
+- Single service testing: Tests carried out in isolation by a team that owns a particular microservice in a system.
+- Staging environment: Tests that are run on objects in a staging environment. The microservices that form a particular application are deployed into a staging environment for testing.
+- Production environment: Tests carried out on the live production system. 
+
+Tests should be automated as part of the build, release, run (delivery) pipeline.
+
 # References
 
 * https://martinfowler.com/articles/microservice-testing/
