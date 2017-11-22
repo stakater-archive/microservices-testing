@@ -243,6 +243,12 @@ Individual microservices should also be resilient to problems in their own deplo
 
 Couple your recoverability testing with taking down service instances. Allow your orchestration system to create the new instances and monitor how long it takes to start the new service
 
+---
+
+## Chapter 7 - building-microservices-designing-fine-grained-systems
+
+TODO
+
 # References
 
 * https://martinfowler.com/articles/microservice-testing/
