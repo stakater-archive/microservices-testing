@@ -1,5 +1,7 @@
 # microservices-testing
 
+**NOTE** It has been moved to [developer-handbook](https://github.com/stakater/developer-handbook)
+
 how to test microservices based applications?
 
 > There has been a shift in service based architectures over the last few years towards smaller, more focussed "micro" services. There are many benefits with this approach such as the ability to independently deploy, scale and maintain each component and parallelize development across multiple teams. However, once these additional network partitions have been introduced, the testing strategies that applied for monolithic in process applications need to be reconsidered.
